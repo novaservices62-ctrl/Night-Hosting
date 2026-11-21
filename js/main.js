@@ -58,11 +58,11 @@ document.querySelectorAll('.faq-q').forEach(q => {
 
 // ---- Terminal typewriter
 const lines = [
-  { prefix: '$ ', text: 'git push night main', color: 'white' },
+  { prefix: '$ ', text: 'git push moon main', color: 'white' },
   { prefix: '',   text: 'Deploying community-bot...', color: 'dim' },
   { prefix: '',   text: '✓ Build complete  (2.1s)', color: 'green' },
   { prefix: '',   text: '✓ Container started', color: 'green' },
-  { prefix: '',   text: 'Logged in as NightBot#0001', color: 'blue' },
+  { prefix: '',   text: 'Logged in as MoonBot#0001', color: 'blue' },
   { prefix: '',   text: 'Serving 1,204 guilds', color: 'blue' },
 ];
 const terminal = document.getElementById('terminal-output');
