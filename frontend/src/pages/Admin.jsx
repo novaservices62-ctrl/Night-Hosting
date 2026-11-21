@@ -1,16 +1,18 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import api from '../api';
 
 function StatusDot({ status }) {
   const isRunning = status === 'online' || status === 'running';
   const isCrashed = status === 'crashed';
+  const isExpired = status === 'expired';
   return (
     <span className={`inline-flex items-center gap-1.5 text-sm ${
-      isRunning ? 'text-green-400' : isCrashed ? 'text-red-400' : 'text-gray-400'
+      isRunning ? 'text-green-400' : isCrashed ? 'text-red-400' : isExpired ? 'text-red-400' : 'text-gray-400'
     }`}>
       <span className={`w-2 h-2 rounded-full ${
-        isRunning ? 'bg-green-400' : isCrashed ? 'bg-red-500' : 'bg-gray-500'
+        isRunning ? 'bg-green-400' : isCrashed || isExpired ? 'bg-red-500' : 'bg-gray-500'
       }`} />
       <span className="capitalize">{status || 'stopped'}</span>
     </span>
@@ -18,10 +20,14 @@ function StatusDot({ status }) {
 }
 
 export default function Admin() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [bots, setBots] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [coinsModal, setCoinsModal] = useState(null);
+  const [coinAmount, setCoinAmount] = useState('');
+  const [coinReason, setCoinReason] = useState('');
   const intervalRef = useRef(null);
 
   const fetchData = useCallback(async () => {
@@ -92,6 +98,7 @@ export default function Admin() {
                 <tr className="border-b border-gray-800 text-gray-400 text-xs uppercase tracking-wider">
                   <th className="text-left px-5 py-3">Username</th>
                   <th className="text-left px-5 py-3">Role</th>
+                  <th className="text-left px-5 py-3">Coins</th>
                   <th className="text-left px-5 py-3">Status</th>
                   <th className="text-left px-5 py-3">Actions</th>
                 </tr>
@@ -99,7 +106,7 @@ export default function Admin() {
               <tbody>
                 {users.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-5 py-6 text-gray-600 text-center">No users found.</td>
+                    <td colSpan={5} className="px-5 py-6 text-gray-600 text-center">No users found.</td>
                   </tr>
                 )}
                 {users.map((u) => (
@@ -114,6 +121,7 @@ export default function Admin() {
                         {u.role || 'user'}
                       </span>
                     </td>
+                    <td className="px-5 py-3 text-yellow-300 font-semibold">{u.coins ?? 0}</td>
                     <td className="px-5 py-3">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                         !u.enabled
@@ -133,6 +141,12 @@ export default function Admin() {
                         }`}
                       >
                         {!u.enabled ? 'Enable' : 'Disable'}
+                      </button>
+                      <button
+                        onClick={() => { setCoinsModal(u); setCoinAmount(''); setCoinReason(''); }}
+                        className="ml-2 px-3 py-1 text-xs font-semibold rounded-lg bg-yellow-700 hover:bg-yellow-600 text-white transition-colors"
+                      >
+                        Coins
                       </button>
                     </td>
                   </tr>
@@ -154,13 +168,15 @@ export default function Admin() {
                   <th className="text-left px-5 py-3">Status</th>
                   <th className="text-left px-5 py-3">CPU</th>
                   <th className="text-left px-5 py-3">Memory</th>
+                  <th className="text-left px-5 py-3">Plan</th>
+                  <th className="text-left px-5 py-3">Expires</th>
                   <th className="text-left px-5 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {bots.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-5 py-6 text-gray-600 text-center">No bots found.</td>
+                    <td colSpan={9} className="px-5 py-6 text-gray-600 text-center">No bots found.</td>
                   </tr>
                 )}
                 {bots.map((bot) => (
@@ -185,6 +201,10 @@ export default function Admin() {
                     <td className="px-5 py-3 text-gray-300">
                       {bot.memory !== undefined ? `${Number(bot.memory).toFixed(0)} MB` : '—'}
                     </td>
+                    <td className="px-5 py-3 text-gray-300 capitalize">{bot.plan || '—'}</td>
+                    <td className="px-5 py-3 text-gray-300 text-xs">
+                      {bot.expires_at ? new Date(bot.expires_at).toLocaleDateString() : '—'}
+                    </td>
                     <td className="px-5 py-3">
                       <div className="flex gap-1.5">
                         <button
@@ -205,6 +225,12 @@ export default function Admin() {
                         >
                           Restart
                         </button>
+                        <button
+                          onClick={() => navigate(`/bots/${bot.id}/console`)}
+                          className="px-2 py-1 text-xs font-semibold rounded bg-indigo-700 hover:bg-indigo-600 text-white transition-colors"
+                        >
+                          Console
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -214,6 +240,48 @@ export default function Admin() {
           </div>
         )}
       </main>
+
+      {/* Coins Modal */}
+      {coinsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+          <div className="bg-gray-900 rounded-2xl p-7 w-full max-w-sm border border-gray-700">
+            <h3 className="text-lg font-bold text-white mb-4">Add/Remove Coins — {coinsModal.username}</h3>
+            <div className="space-y-3">
+              <input
+                type="number"
+                placeholder="Amount (negative to remove)"
+                value={coinAmount}
+                onChange={e => setCoinAmount(e.target.value)}
+                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:outline-none"
+              />
+              <input
+                type="text"
+                placeholder="Reason"
+                value={coinReason}
+                onChange={e => setCoinReason(e.target.value)}
+                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:outline-none"
+              />
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={async () => {
+                  try {
+                    await api.post(`/admin/users/${coinsModal.id}/coins`, { amount: Number(coinAmount), reason: coinReason });
+                    setCoinsModal(null);
+                    fetchData();
+                  } catch (err) {
+                    alert(err.response?.data?.error || 'Failed');
+                  }
+                }}
+                className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg"
+              >
+                Apply
+              </button>
+              <button onClick={() => setCoinsModal(null)} className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

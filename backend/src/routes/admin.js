@@ -1,4 +1,5 @@
 const express = require('express');
+const { v4: uuidv4 } = require('uuid');
 const db = require('../db');
 const pm2Manager = require('../pm2Manager');
 const { authenticateToken, requireAdmin } = require('../auth');
@@ -10,7 +11,7 @@ router.use(authenticateToken, requireAdmin);
 // GET /api/admin/users — list all users (without password)
 router.get('/users', (req, res) => {
   try {
-    const users = db.prepare('SELECT id, username, role, enabled, created_at FROM users').all();
+    const users = db.prepare('SELECT id, username, role, enabled, coins, created_at FROM users').all();
     return res.json(users);
   } catch (err) {
     console.error('Admin list users error:', err);
@@ -28,10 +29,51 @@ router.put('/users/:userId/toggle', (req, res) => {
   try {
     const newEnabled = user.enabled ? 0 : 1;
     db.prepare('UPDATE users SET enabled = ? WHERE id = ?').run(newEnabled, user.id);
-    const updated = db.prepare('SELECT id, username, role, enabled, created_at FROM users WHERE id = ?').get(user.id);
+    const updated = db.prepare('SELECT id, username, role, enabled, coins, created_at FROM users WHERE id = ?').get(user.id);
     return res.json(updated);
   } catch (err) {
     console.error('Toggle user error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/admin/users/:userId/coins — add or remove coins
+router.post('/users/:userId/coins', (req, res) => {
+  const { amount, reason } = req.body;
+  if (typeof amount !== 'number' || !reason) {
+    return res.status(400).json({ error: 'amount (number) and reason (string) are required' });
+  }
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.userId);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const newBalance = (user.coins || 0) + amount;
+  if (newBalance < 0) return res.status(400).json({ error: 'Resulting balance cannot be negative' });
+
+  db.prepare('UPDATE users SET coins = ? WHERE id = ?').run(newBalance, user.id);
+  db.prepare(
+    'INSERT INTO coins_transactions (id, user_id, amount, reason, created_at) VALUES (?, ?, ?, ?, ?)'
+  ).run(uuidv4(), user.id, amount, reason, new Date().toISOString());
+
+  const updated = db.prepare('SELECT id, username, role, enabled, coins, created_at FROM users WHERE id = ?').get(user.id);
+  return res.json(updated);
+});
+
+// GET /api/admin/users/:userId/bots — list bots for a specific user
+router.get('/users/:userId/bots', async (req, res) => {
+  try {
+    const bots = db.prepare('SELECT * FROM bots WHERE user_id = ?').all(req.params.userId);
+    const botsWithStatus = await Promise.all(
+      bots.map(async (bot) => {
+        const statusInfo = await pm2Manager.getBotStatus(bot.user_id, bot.id);
+        if (bot.status === 'expired') {
+          return { ...bot, ...statusInfo, status: 'expired' };
+        }
+        return { ...bot, ...statusInfo };
+      })
+    );
+    return res.json(botsWithStatus);
+  } catch (err) {
+    console.error('Admin get user bots error:', err);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -43,6 +85,9 @@ router.get('/bots', async (req, res) => {
     const botsWithStatus = await Promise.all(
       bots.map(async (bot) => {
         const statusInfo = await pm2Manager.getBotStatus(bot.user_id, bot.id);
+        if (bot.status === 'expired') {
+          return { ...bot, ...statusInfo, status: 'expired' };
+        }
         return { ...bot, ...statusInfo };
       })
     );

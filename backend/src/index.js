@@ -6,6 +6,7 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const path = require('path');
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 
 // Import db first to trigger table creation and admin seed
 const db = require('./db');
@@ -88,3 +89,47 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Night Host panel running on port ${PORT}`);
 });
+
+// Expiry background job — runs every 5 minutes
+setInterval(async () => {
+  try {
+    const now = new Date().toISOString();
+    // Get all bots that are expired and not already marked expired
+    const expiredBots = db.prepare(
+      "SELECT * FROM bots WHERE expires_at IS NOT NULL AND expires_at < ? AND status != 'expired'"
+    ).all(now);
+
+    for (const bot of expiredBots) {
+      // Check if user has enough coins for auto-renewal
+      const user = db.prepare('SELECT * FROM users WHERE id = ?').get(bot.user_id);
+      const renewalCost = bot.plan === 'weekly' ? 20 : bot.plan === 'monthly' ? 40 : null;
+
+      let renewed = false;
+      if (renewalCost !== null && user && user.coins >= renewalCost) {
+        // Auto-renew: deduct coins, extend expires_at
+        const durationMs = bot.plan === 'weekly' ? 7 * 24 * 60 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000;
+        const newExpiry = new Date(Date.now() + durationMs).toISOString();
+        db.prepare('UPDATE users SET coins = coins - ? WHERE id = ?').run(renewalCost, user.id);
+        db.prepare('UPDATE bots SET expires_at = ? WHERE id = ?').run(newExpiry, bot.id);
+        db.prepare(
+          'INSERT INTO coins_transactions (id, user_id, amount, reason, created_at) VALUES (?, ?, ?, ?, ?)'
+        ).run(uuidv4(), user.id, -renewalCost, `Auto-renewal: ${bot.plan} plan for bot ${bot.name}`, new Date().toISOString());
+        renewed = true;
+        console.log(`[expiry] Auto-renewed bot ${bot.id} (${bot.name}) for user ${user.username}`);
+      }
+
+      if (!renewed) {
+        // Stop the PM2 process and mark as expired
+        try {
+          await pm2Manager.stopBot(bot.user_id, bot.id);
+        } catch (e) {
+          console.warn(`[expiry] Could not stop pm2 for bot ${bot.id}:`, e.message);
+        }
+        db.prepare("UPDATE bots SET status = 'expired' WHERE id = ?").run(bot.id);
+        console.log(`[expiry] Expired bot ${bot.id} (${bot.name}) for user ${user ? user.username : bot.user_id}`);
+      }
+    }
+  } catch (err) {
+    console.error('[expiry] Background job error:', err);
+  }
+}, 300000);

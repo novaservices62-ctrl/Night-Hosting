@@ -2,10 +2,11 @@ import React from 'react';
 
 function StatusBadge({ status }) {
   const configs = {
-    online:  { dot: 'bg-green-400',  text: 'text-green-400',  label: 'Online'  },
-    running: { dot: 'bg-green-400',  text: 'text-green-400',  label: 'Running' },
-    stopped: { dot: 'bg-gray-500',   text: 'text-gray-400',   label: 'Stopped' },
-    crashed: { dot: 'bg-red-500',    text: 'text-red-400',    label: 'Crashed' },
+    online:   { dot: 'bg-green-400',  text: 'text-green-400',  label: 'Online'  },
+    running:  { dot: 'bg-green-400',  text: 'text-green-400',  label: 'Running' },
+    stopped:  { dot: 'bg-gray-500',   text: 'text-gray-400',   label: 'Stopped' },
+    crashed:  { dot: 'bg-red-500',    text: 'text-red-400',    label: 'Crashed' },
+    expired:  { dot: 'bg-red-600',    text: 'text-red-400',    label: 'Expired' },
   };
   const cfg = configs[status] || configs.stopped;
   return (
@@ -35,8 +36,16 @@ export default function BotCard({
   onDelete,
   onConsole,
   onFiles,
+  onRenew,
 }) {
   const isRunning = bot.status === 'online' || bot.status === 'running';
+  const isExpired = bot.status === 'expired';
+
+  const showRenew = bot.plan !== 'trial' && (() => {
+    if (isExpired) return true;
+    if (bot.expires_at && (new Date(bot.expires_at) - Date.now()) < 24 * 60 * 60 * 1000) return true;
+    return false;
+  })();
 
   return (
     <div className="bg-gray-800 rounded-xl p-4 border border-gray-700 flex flex-col gap-3">
@@ -47,7 +56,18 @@ export default function BotCard({
           <div className="flex items-center gap-2 mt-1">
             <RuntimeBadge runtime={bot.runtime} />
             <StatusBadge status={bot.status} />
+            {isExpired && (
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-red-900 text-red-300">EXPIRED</span>
+            )}
           </div>
+          {bot.plan && (
+            <div className="text-xs text-gray-500 mt-1">
+              <span className="capitalize">{bot.plan}</span>
+              {bot.expires_at && (
+                <span> · Expires {new Date(bot.expires_at).toLocaleDateString()}</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -69,7 +89,7 @@ export default function BotCard({
 
       {/* Actions */}
       <div className="flex flex-wrap gap-2 pt-1">
-        {!isRunning && (
+        {!isRunning && !isExpired && (
           <button
             onClick={() => onStart(bot.id)}
             className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-700 hover:bg-green-600 text-white transition-colors"
@@ -85,12 +105,14 @@ export default function BotCard({
             Stop
           </button>
         )}
-        <button
-          onClick={() => onRestart(bot.id)}
-          className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-700 hover:bg-blue-600 text-white transition-colors"
-        >
-          Restart
-        </button>
+        {!isExpired && (
+          <button
+            onClick={() => onRestart(bot.id)}
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-700 hover:bg-blue-600 text-white transition-colors"
+          >
+            Restart
+          </button>
+        )}
         <button
           onClick={() => onConsole(bot.id)}
           className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-700 hover:bg-indigo-600 text-white transition-colors"
@@ -103,6 +125,14 @@ export default function BotCard({
         >
           Files
         </button>
+        {showRenew && (
+          <button
+            onClick={() => onRenew(bot.id)}
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-purple-700 hover:bg-purple-600 text-white transition-colors"
+          >
+            Renew
+          </button>
+        )}
         <button
           onClick={() => onDelete(bot.id)}
           className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-800 hover:bg-red-700 text-white transition-colors"

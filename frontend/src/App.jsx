@@ -4,8 +4,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Bots from './pages/Bots';
-import Console from './pages/Console';
-import FileManager from './pages/FileManager';
+import BotDetail from './pages/BotDetail';
+import Billing from './pages/Billing';
 import Admin from './pages/Admin';
 
 export const AuthContext = createContext(null);
@@ -90,18 +90,18 @@ export default function App() {
           }
         />
         <Route
-          path="/bots/:botId/console"
+          path="/bots/:botId"
           element={
             <ProtectedRoute>
-              <Console />
+              <BotDetail />
             </ProtectedRoute>
           }
         />
         <Route
-          path="/bots/:botId/files"
+          path="/billing"
           element={
             <ProtectedRoute>
-              <FileManager />
+              <Billing />
             </ProtectedRoute>
           }
         />

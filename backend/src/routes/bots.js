@@ -36,6 +36,10 @@ router.get('/', async (req, res) => {
     const botsWithStatus = await Promise.all(
       bots.map(async (bot) => {
         const statusInfo = await pm2Manager.getBotStatus(bot.user_id, bot.id);
+        // If DB says expired, keep that status regardless of pm2
+        if (bot.status === 'expired') {
+          return { ...bot, ...statusInfo, status: 'expired' };
+        }
         return { ...bot, ...statusInfo };
       })
     );
@@ -46,9 +50,15 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /api/bots/me — return current user's info including coins
+router.get('/me', (req, res) => {
+  const user = db.prepare('SELECT id, username, coins FROM users WHERE id = ?').get(req.user.id);
+  return res.json(user);
+});
+
 // POST /api/bots — create a new bot
 router.post('/', (req, res) => {
-  const { name, runtime, entryFile } = req.body;
+  const { name, runtime, entryFile, plan: rawPlan } = req.body;
 
   if (!name || !runtime || !entryFile) {
     return res.status(400).json({ error: 'name, runtime, and entryFile are required' });
@@ -58,16 +68,48 @@ router.post('/', (req, res) => {
     return res.status(400).json({ error: 'runtime must be "node" or "python"' });
   }
 
+  const plan = rawPlan || 'trial';
+  if (!['trial', 'weekly', 'monthly'].includes(plan)) {
+    return res.status(400).json({ error: 'plan must be "trial", "weekly", or "monthly"' });
+  }
+
+  const planCosts = { trial: 10, weekly: 20, monthly: 40 };
+  const planDurations = {
+    trial: 1 * 24 * 60 * 60 * 1000,
+    weekly: 7 * 24 * 60 * 60 * 1000,
+    monthly: 30 * 24 * 60 * 60 * 1000
+  };
+  const cost = planCosts[plan];
+  const durationMs = planDurations[plan];
+
   try {
-    const botId = uuidv4();
     const userId = req.user.id;
+    const userRow = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+    const currentCoins = userRow ? (userRow.coins || 0) : 0;
+
+    if (currentCoins < cost) {
+      return res.status(400).json({ error: `Not enough coins. This plan costs ${cost} coins.` });
+    }
+
+    const botId = uuidv4();
     const botDir = path.join(BOT_BASE_PATH, userId, botId);
     fs.mkdirSync(botDir, { recursive: true });
 
     const now = new Date().toISOString();
+    const expiresAt = new Date(Date.now() + durationMs).toISOString();
+
+    // Deduct coins
+    db.prepare('UPDATE users SET coins = coins - ? WHERE id = ?').run(cost, userId);
+
+    // Record transaction
     db.prepare(
-      'INSERT INTO bots (id, user_id, name, runtime, entry_file, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
-    ).run(botId, userId, name, runtime, entryFile, 'stopped', now);
+      'INSERT INTO coins_transactions (id, user_id, amount, reason, created_at) VALUES (?, ?, ?, ?, ?)'
+    ).run(uuidv4(), userId, -cost, `Bot creation: ${plan} plan`, now);
+
+    // Insert bot with plan and expires_at
+    db.prepare(
+      'INSERT INTO bots (id, user_id, name, runtime, entry_file, status, plan, expires_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    ).run(botId, userId, name, runtime, entryFile, 'stopped', plan, expiresAt, now);
 
     const bot = db.prepare('SELECT * FROM bots WHERE id = ?').get(botId);
     return res.status(201).json(bot);
@@ -85,9 +127,82 @@ router.get('/:botId', async (req, res) => {
   }
   try {
     const statusInfo = await pm2Manager.getBotStatus(bot.user_id, bot.id);
+    if (bot.status === 'expired') {
+      return res.json({ ...bot, ...statusInfo, status: 'expired' });
+    }
     return res.json({ ...bot, ...statusInfo });
   } catch (err) {
     return res.json(bot);
+  }
+});
+
+// POST /api/bots/:botId/renew — renew bot plan
+router.post('/:botId/renew', async (req, res) => {
+  const bot = db.prepare('SELECT * FROM bots WHERE id = ? AND user_id = ?').get(req.params.botId, req.user.id);
+  if (!bot) {
+    return res.status(404).json({ error: 'Bot not found' });
+  }
+
+  if (bot.plan === 'trial') {
+    return res.status(400).json({ error: 'Trial bots cannot be renewed.' });
+  }
+
+  const planCosts = { weekly: 20, monthly: 40 };
+  const planDurations = {
+    weekly: 7 * 24 * 60 * 60 * 1000,
+    monthly: 30 * 24 * 60 * 60 * 1000
+  };
+
+  const cost = planCosts[bot.plan];
+  const durationMs = planDurations[bot.plan];
+
+  if (cost === undefined) {
+    return res.status(400).json({ error: 'Unknown plan type.' });
+  }
+
+  try {
+    const userId = req.user.id;
+    const userRow = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+    const currentCoins = userRow ? (userRow.coins || 0) : 0;
+
+    if (currentCoins < cost) {
+      return res.status(400).json({ error: `Not enough coins. Renewal costs ${cost} coins.` });
+    }
+
+    const now = new Date();
+    // Extend from now if expired, otherwise extend from current expiry
+    const baseTime = (bot.expires_at && new Date(bot.expires_at) > now)
+      ? new Date(bot.expires_at).getTime()
+      : now.getTime();
+    const newExpiry = new Date(baseTime + durationMs).toISOString();
+
+    // Deduct coins
+    db.prepare('UPDATE users SET coins = coins - ? WHERE id = ?').run(cost, userId);
+
+    // Record transaction
+    db.prepare(
+      'INSERT INTO coins_transactions (id, user_id, amount, reason, created_at) VALUES (?, ?, ?, ?, ?)'
+    ).run(uuidv4(), userId, -cost, `Bot renewal: ${bot.plan} plan`, now.toISOString());
+
+    // Update expires_at
+    db.prepare('UPDATE bots SET expires_at = ? WHERE id = ?').run(newExpiry, bot.id);
+
+    // If bot was expired, restart it and set status to running
+    if (bot.status === 'expired') {
+      try {
+        await pm2Manager.startBot(bot.user_id, bot.id, bot.runtime, bot.entry_file);
+        db.prepare("UPDATE bots SET status = 'running' WHERE id = ?").run(bot.id);
+      } catch (startErr) {
+        console.warn(`[renew] Could not restart bot ${bot.id}:`, startErr.message);
+        db.prepare("UPDATE bots SET status = 'stopped' WHERE id = ?").run(bot.id);
+      }
+    }
+
+    const updated = db.prepare('SELECT * FROM bots WHERE id = ?').get(bot.id);
+    return res.json(updated);
+  } catch (err) {
+    console.error('Renew bot error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -196,6 +311,50 @@ router.get('/:botId/status', async (req, res) => {
     console.error('Status error:', err);
     return res.status(500).json({ error: 'Failed to get status' });
   }
+});
+
+// GET /api/bots/:botId/env
+router.get('/:botId/env', (req, res) => {
+  const bot = db.prepare('SELECT * FROM bots WHERE id = ? AND user_id = ?').get(req.params.botId, req.user.id);
+  if (!bot) return res.status(404).json({ error: 'Bot not found' });
+
+  const vars = db.prepare('SELECT key, value FROM bot_env WHERE bot_id = ?').all(bot.id);
+  return res.json(vars);
+});
+
+// POST /api/bots/:botId/env
+router.post('/:botId/env', (req, res) => {
+  const bot = db.prepare('SELECT * FROM bots WHERE id = ? AND user_id = ?').get(req.params.botId, req.user.id);
+  if (!bot) return res.status(404).json({ error: 'Bot not found' });
+
+  const { vars } = req.body;
+  if (!Array.isArray(vars)) return res.status(400).json({ error: 'vars must be an array of { key, value } objects' });
+
+  // Replace env vars in DB
+  const deleteStmt = db.prepare('DELETE FROM bot_env WHERE bot_id = ?');
+  const insertStmt = db.prepare('INSERT INTO bot_env (id, bot_id, key, value) VALUES (?, ?, ?, ?)');
+  const { v4: uuidv4Local } = require('uuid');
+
+  const replaceAll = db.transaction(() => {
+    deleteStmt.run(bot.id);
+    for (const { key, value } of vars) {
+      if (key && typeof key === 'string') {
+        insertStmt.run(uuidv4Local(), bot.id, key, value || '');
+      }
+    }
+  });
+  replaceAll();
+
+  // Write .env file to bot directory
+  const botDir = path.join(BOT_BASE_PATH, bot.user_id, bot.id);
+  fs.mkdirSync(botDir, { recursive: true });
+  const envContent = vars
+    .filter(({ key }) => key && typeof key === 'string')
+    .map(({ key, value }) => `${key}=${value || ''}`)
+    .join('\n');
+  fs.writeFileSync(path.join(botDir, '.env'), envContent, 'utf8');
+
+  return res.json({ message: 'Environment variables saved', count: vars.filter(({ key }) => key && typeof key === 'string').length });
 });
 
 module.exports = router;

@@ -31,6 +31,38 @@ db.exec(`
   );
 `);
 
+// Idempotent migrations — wrap each in try/catch so re-runs don't crash
+try {
+  db.exec("ALTER TABLE users ADD COLUMN coins INTEGER DEFAULT 0");
+} catch {}
+
+try {
+  db.exec("ALTER TABLE bots ADD COLUMN plan TEXT DEFAULT 'trial'");
+} catch {}
+
+try {
+  db.exec("ALTER TABLE bots ADD COLUMN expires_at TEXT");
+} catch {}
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS coins_transactions (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    amount INTEGER NOT NULL,
+    reason TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS bot_env (
+    id TEXT PRIMARY KEY,
+    bot_id TEXT NOT NULL,
+    key TEXT NOT NULL,
+    value TEXT NOT NULL DEFAULT ''
+  );
+`);
+
 // Seed admin user if not exists
 const existing = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
 if (!existing) {
@@ -41,5 +73,8 @@ if (!existing) {
   ).run(uuidv4(), 'admin', hashed, 'admin', 1, new Date().toISOString());
   console.log('Admin user seeded (username: admin, password: admin123)');
 }
+
+// Always ensure admin has 9999 coins
+db.prepare('UPDATE users SET coins = 9999 WHERE username = ?').run('admin');
 
 module.exports = db;

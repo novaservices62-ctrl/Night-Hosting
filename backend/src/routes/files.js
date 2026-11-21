@@ -2,6 +2,10 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { authenticateToken } = require('../auth');
+const multer = require('multer');
+const unzipper = require('unzipper');
+const db = require('../db');
+const zipUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 100 * 1024 * 1024 } });
 
 const router = express.Router();
 const BOT_BASE_PATH = process.env.BOT_BASE_PATH || '/home/nighthost/bots';
@@ -140,6 +144,32 @@ router.delete('/:botId/files', (req, res) => {
     }
     console.error('Delete file error:', err);
     return res.status(500).json({ error: 'Failed to delete file' });
+  }
+});
+
+// POST /api/files/:botId/upload-zip — accept a zip file, extract to bot directory
+router.post('/:botId/upload-zip', zipUpload.single('file'), async (req, res) => {
+  const userId = req.user.id;
+  const botId = req.params.botId;
+
+  const bot = db.prepare('SELECT * FROM bots WHERE id = ? AND user_id = ?').get(botId, userId);
+  if (!bot) return res.status(404).json({ error: 'Bot not found' });
+
+  if (!req.file) return res.status(400).json({ error: 'No zip file uploaded. Use field name "file".' });
+
+  const botDir = path.resolve(path.join(BOT_BASE_PATH, userId, botId));
+  fs.mkdirSync(botDir, { recursive: true });
+
+  try {
+    const { Readable } = require('stream');
+    const readable = Readable.from(req.file.buffer);
+    await readable
+      .pipe(unzipper.Extract({ path: botDir }))
+      .promise();
+    return res.json({ message: 'Zip extracted successfully' });
+  } catch (err) {
+    console.error('Zip extract error:', err);
+    return res.status(500).json({ error: 'Failed to extract zip: ' + err.message });
   }
 });
 
