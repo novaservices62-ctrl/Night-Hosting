@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Night — Bot Hosting. Online 24/7.</title>
+  <meta name="description" content="Night is a powerful bot hosting platform. Host your Discord bots, APIs, websites and databases. Free to start, no card required." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta property="og:title" content="Night — Bot Hosting. Online 24/7." />
+  <meta property="og:description" content="Host your Discord bots, Node.js apps, Python scripts, websites and databases. Free to start." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🌙</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav>
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <span class="dot"></span>
+      Night
+    </a>
+
+    <div class="nav-links">
+      <!-- Hosting dropdown -->
+      <div class="nav-dropdown">
+        <div class="nav-dropdown-toggle">
+          Hosting
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M2 4l4 4 4-4"/>
+          </svg>
+        </div>
+        <div class="nav-dropdown-menu">
+          <a href="discord-bot-hosting.html">
+            <span>Discord bot hosting</span>
+            <span>discord.js, discord.py, JDA and more</span>
+          </a>
+          <a href="nodejs-hosting.html">
+            <span>Node.js hosting</span>
+            <span>APIs, workers and scripts that run all day</span>
+          </a>
+          <a href="python-hosting.html">
+            <span>Python hosting</span>
+            <span>Bots, scrapers, schedulers and web apps</span>
+          </a>
+          <a href="website-hosting.html">
+            <span>Website hosting</span>
+            <span>Static and PHP sites, or full web apps</span>
+          </a>
+          <a href="database-hosting.html">
+            <span>Database hosting</span>
+            <span>MySQL, PostgreSQL, MongoDB and Redis</span>
+          </a>
+        </div>
+      </div>
+      <a href="pricing.html">Pricing</a>
+      <a href="docs.html">Docs</a>
+      <a href="templates.html">Templates</a>
+      <a href="blog.html">Blog</a>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn-ghost" onclick="window.location.href='login.html'">Log in</button>
+      <button class="btn-primary" onclick="window.location.href='login.html'">Start free</button>
+    </div>
+
+    <div class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobile-nav">
+  <a href="discord-bot-hosting.html">Discord bot hosting</a>
+  <a href="nodejs-hosting.html">Node.js hosting</a>
+  <a href="python-hosting.html">Python hosting</a>
+  <a href="website-hosting.html">Website hosting</a>
+  <a href="database-hosting.html">Database hosting</a>
+  <a href="pricing.html">Pricing</a>
+  <a href="docs.html">Docs</a>
+  <a href="templates.html">Templates</a>
+  <a href="blog.html">Blog</a>
+  <div class="mobile-ctas">
+    <button class="btn-ghost" onclick="window.location.href='login.html'">Log in</button>
+    <button class="btn-primary" onclick="window.location.href='login.html'">Start free</button>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-grid-bg"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="pulse"></span>
+        Live — 100k+ bots hosted right now
+      </div>
+      <h1>Your bot stays online.<br><em>Even when you sleep.</em></h1>
+      <p class="hero-sub">Discord bots, Telegram bots, Node.js apps, Python scripts, websites and databases — all on one account. Free to start, no card.</p>
+      <div class="hero-ctas">
+        <button class="btn-primary large" onclick="window.location.href='login.html'">Start for free</button>
+        <a href="pricing.html" class="btn-outline">See pricing</a>
+      </div>
+
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num">500k+</div>
+          <div class="hero-stat-label">Developers</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">100k+</div>
+          <div class="hero-stat-label">Bots hosted</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">99.9%</div>
+          <div class="hero-stat-label">Uptime target</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">2024</div>
+          <div class="hero-stat-label">Online since</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel preview -->
+    <div class="panel reveal">
+      <div class="panel-bar">
+        <span class="panel-dot r"></span>
+        <span class="panel-dot y"></span>
+        <span class="panel-dot g"></span>
+        <span class="panel-title">Night Panel — my-community</span>
+      </div>
+      <div class="deploy-list">
+        <div class="deploy-row">
+          <span class="status-dot running"></span>
+          <span class="deploy-name">community-bot</span>
+          <span class="deploy-type">Node.js · discord.js</span>
+          <span class="deploy-uptime">Running · 14d 3h</span>
+        </div>
+        <div class="deploy-row">
+          <span class="status-dot running"></span>
+          <span class="deploy-name">community-site</span>
+          <span class="deploy-type">Static site · custom domain</span>
+          <span class="deploy-uptime">Running · 21d 6h</span>
+        </div>
+        <div class="deploy-row">
+          <span class="status-dot running"></span>
+          <span class="deploy-name">community-db</span>
+          <span class="deploy-type">MySQL · in-project</span>
+          <span class="deploy-uptime">Running · 21d 6h</span>
+        </div>
+        <div class="deploy-row">
+          <span class="status-dot idle"></span>
+          <span class="deploy-name">price-tracker</span>
+          <span class="deploy-type">Python · tracker.py</span>
+          <span class="deploy-uptime">Idle · 2h 11m</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEPS ============ -->
+<section id="steps">
+  <div class="container">
+    <div class="section-label">Setup</div>
+    <h2>Online in three steps.</h2>
+    <p class="section-sub">No server, no SSH, no process manager. If it runs on your machine, it runs here.</p>
+
+    <div class="steps-grid reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Bring your code</h3>
+        <p>Connect a GitHub repository (public or private), upload a zip archive, or start from a community template. Night pulls your code and builds it.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Add your secrets</h3>
+        <p>Tokens and API keys go into environment variables. Mark them secret — they're masked in logs and never exposed to other users or deployments.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>It stays online</h3>
+        <p>Your process starts, is restarted automatically if it crashes, backed up as it changes, and its logs stream in real time straight to your panel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section id="features">
+  <div class="container">
+    <div class="features-header">
+      <div class="section-label">Platform</div>
+      <h2>Everything it needs.<br>Nothing to manage.</h2>
+      <p class="section-sub">The tools you'd set up yourself on a server — already in place, already shown in the panel.</p>
+    </div>
+
+    <div class="features-grid reveal">
+
+      <!-- Console -->
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path d="M8 21h8M12 17v4"/>
+          <path d="M6 8l2 2-2 2M10 12h4"/>
+        </svg>
+        <h3>Live console &amp; metrics</h3>
+        <p>Follow logs, CPU and memory live. If your process crashes, it restarts automatically and the full log stays in the console.</p>
+        <ul class="feature-bullets">
+          <li>Shell access inside your container</li>
+          <li>AI log reader — explains errors in plain words</li>
+          <li>CPU, memory and uptime on every plan</li>
+        </ul>
+        <div class="mini-terminal">
+          <div id="terminal-output"></div>
+        </div>
+      </div>
+
+      <!-- Backups -->
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        <h3>Continuous backups</h3>
+        <p>Restore points are taken as your files change — from every hour on Free down to every minute on Pro — and kept for up to 90 days.</p>
+        <ul class="feature-bullets">
+          <li>Restore in one click, even a deleted deployment</li>
+          <li>Databases backed up like everything else</li>
+          <li>24 h to 90 days of history, by plan</li>
+        </ul>
+      </div>
+
+      <!-- Domains -->
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <h3>Domains &amp; databases</h3>
+        <p>Activate a free HTTPS subdomain or attach your own domain, and run your database as a deployment inside the same project.</p>
+        <ul class="feature-bullets">
+          <li>Free subdomain on night.cloud</li>
+          <li>MySQL, PostgreSQL, MongoDB or Redis in one click</li>
+          <li>Custom ports and static IP on paid plans</li>
+        </ul>
+      </div>
+
+      <!-- Templates -->
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        <h3>Community templates</h3>
+        <p>Ready-made bots and apps built by the Night community. Pick one, fill in its variables, and deploy in under a minute.</p>
+        <ul class="feature-bullets">
+          <li>Discord moderation, music, economy bots</li>
+          <li>Telegram bots and webhook handlers</li>
+          <li>Submit your own to the marketplace</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ RUNTIMES ============ -->
+<section id="runtimes">
+  <div class="container">
+    <div class="runtimes-header">
+      <div class="section-label">Runtimes</div>
+      <h2>What you can host.</h2>
+      <p class="section-sub">One account, one resource pool. Every language and database runs side by side.</p>
+    </div>
+
+    <div class="runtimes-grid reveal">
+      <div class="runtime-card">
+        <div class="runtime-icon">🟢</div>
+        <h4>Node.js</h4>
+        <p>discord.js, Telegraf, Express, Fastify</p>
+        <span class="runtime-tag">v20 · v22</span>
+      </div>
+      <div class="runtime-card">
+        <div class="runtime-icon">🐍</div>
+        <h4>Python</h4>
+        <p>discord.py, nextcord, Flask, FastAPI</p>
+        <span class="runtime-tag">3.11 · 3.12</span>
+      </div>
+      <div class="runtime-card">
+        <div class="runtime-icon">☕</div>
+        <h4>Java</h4>
+        <p>JDA, Spring Boot, Quarkus</p>
+        <span class="runtime-tag">JDK 21</span>
+      </div>
+      <div class="runtime-card">
+        <div class="runtime-icon">🐹</div>
+        <h4>Go</h4>
+        <p>discordgo, net/http, Fiber</p>
+        <span class="runtime-tag">1.22+</span>
+      </div>
+      <div class="runtime-card">
+        <div class="runtime-icon">🦀</div>
+        <h4>Rust</h4>
+        <p>serenity, twilight, poise</p>
+        <span class="runtime-tag">stable</span>
+      </div>
+      <div class="runtime-card">
+        <div class="runtime-icon">🐘</div>
+        <h4>PHP</h4>
+        <p>Laravel, Symfony, plain scripts</p>
+        <span class="runtime-tag">8.3</span>
+      </div>
+      <div class="runtime-card">
+        <div class="runtime-icon">🗄️</div>
+        <h4>Databases</h4>
+        <p>MySQL, PostgreSQL, MongoDB, Redis</p>
+        <span class="runtime-tag db">1-click</span>
+      </div>
+      <div class="runtime-card">
+        <div class="runtime-icon">🌐</div>
+        <h4>Websites</h4>
+        <p>Static sites, PHP sites, full web apps</p>
+        <span class="runtime-tag">HTTPS free</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section id="pricing">
+  <div class="container">
+    <div class="pricing-header">
+      <div class="section-label">Pricing</div>
+      <h2>Simple pricing.</h2>
+      <p class="section-sub">Start free with no card. Upgrade when your project grows — resources are pooled across all your deployments.</p>
+      <div class="pricing-toggle">
+        <button class="toggle-btn active" data-period="monthly">Monthly</button>
+        <button class="toggle-btn" data-period="yearly">Yearly <span class="toggle-save">−25%</span></button>
+      </div>
+    </div>
+
+    <div class="pricing-grid reveal">
+
+      <!-- Free -->
+      <div class="plan">
+        <span class="plan-name">Free</span>
+        <span class="plan-desc">Try it out, no card required.</span>
+        <div class="plan-price" id="price-free">$0</div>
+        <div class="plan-period">/ month</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 256 MB RAM, 25% CPU</li>
+          <li><span class="check">✓</span> 512 MB storage</li>
+          <li><span class="check">✓</span> 1 deployment</li>
+          <li><span class="check">✓</span> Backup every hour, 24 h history</li>
+          <li><span class="check">✓</span> Free night.cloud subdomain</li>
+          <li><span class="check">✓</span> Manual renewal every 4 days</li>
+        </ul>
+        <a href="login.html" class="plan-cta">Start free</a>
+      </div>
+
+      <!-- Starter -->
+      <div class="plan">
+        <span class="plan-name">Starter</span>
+        <span class="plan-desc">More headroom for growing projects.</span>
+        <div class="plan-price" id="price-starter">$3.99</div>
+        <div class="plan-period">/ month</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 2 GB RAM, 100% CPU</li>
+          <li><span class="check">✓</span> 8 GB storage</li>
+          <li><span class="check">✓</span> 4 deployments</li>
+          <li><span class="check">✓</span> Backups every 15 min, 7 days</li>
+          <li><span class="check">✓</span> No ads · 99.9% uptime target</li>
+          <li><span class="check">✓</span> Custom domain support</li>
+        </ul>
+        <a href="login.html" class="plan-cta">Choose Starter</a>
+      </div>
+
+      <!-- Pro — featured -->
+      <div class="plan featured">
+        <span class="plan-badge">Most popular</span>
+        <span class="plan-name">Pro</span>
+        <span class="plan-desc">For serious production bots.</span>
+        <div class="plan-price" id="price-pro">$9.99</div>
+        <div class="plan-period">/ month</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 8 GB RAM, 250% CPU</li>
+          <li><span class="check">✓</span> 25 GB storage</li>
+          <li><span class="check">✓</span> 12 deployments</li>
+          <li><span class="check">✓</span> Backups every minute, 30 days</li>
+          <li><span class="check">✓</span> Priority support</li>
+          <li><span class="check">✓</span> Static IP &amp; custom ports</li>
+        </ul>
+        <a href="login.html" class="plan-cta">Choose Pro</a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="plan">
+        <span class="plan-name">Enterprise</span>
+        <span class="plan-desc">For large-scale fleets and teams.</span>
+        <div class="plan-price" id="price-enterprise">$24.99</div>
+        <div class="plan-period">/ month</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 32 GB RAM, 800% CPU</li>
+          <li><span class="check">✓</span> 100 GB storage</li>
+          <li><span class="check">✓</span> Unlimited deployments</li>
+          <li><span class="check">✓</span> Backups every minute, 90 days</li>
+          <li><span class="check">✓</span> Dedicated support SLA</li>
+          <li><span class="check">✓</span> Team seats &amp; SSO</li>
+        </ul>
+        <a href="login.html" class="plan-cta">Choose Enterprise</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="container">
+    <div class="faq-header">
+      <div class="section-label">FAQ</div>
+      <h2>Questions, answered.</h2>
+    </div>
+
+    <div class="faq-list reveal">
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Is it really free?
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="faq-a">Yes. The free plan gives you 256 MB of RAM, 25% of a CPU core and one deployment, with no credit card required. You renew it from the panel every 4 days so free resources go to bots that are still in use.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Which languages can I use?
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="faq-a">Node.js, Python, Java, Go, Rust and PHP are fully supported. Databases (MySQL, PostgreSQL, MongoDB, Redis) and one-click services (static sites, PHP sites) all run on the same account and share the same resource pool.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Can I host something other than a Discord bot?
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="faq-a">Absolutely. Telegram bots, Node.js and Python apps, websites, REST APIs, scripts and databases all run on the same account. Night is built for bots first but it's really a general-purpose hosting platform.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          What happens if my bot crashes?
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="faq-a">It is restarted automatically and the full log stays in your console. The AI log reader can read the output and explain what went wrong in plain words, even on the free plan.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Can I deploy from a private GitHub repository?
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="faq-a">Yes. Connect your GitHub account and import any public or private repository. You can also upload a zip archive or start from a blank deployment and push files through the panel.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Do you offer a refund?
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="faq-a">We offer a 7-day money-back guarantee on all paid plans, no questions asked. After that, refunds are handled case by case. Contact support and we'll sort it out.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA BANNER ============ -->
+<section id="cta-banner">
+  <div class="container">
+    <h2>Turn your PC off tonight.<br>Your bot stays online.</h2>
+    <p>Start on the free plan, no card. Upgrade when your project grows.</p>
+    <div class="cta-actions">
+      <button class="btn-primary large" onclick="window.location.href='login.html'">Start for free</button>
+      <a href="pricing.html" class="btn-outline">See pricing</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="/" class="nav-logo" style="margin-bottom:0">
+          <span class="dot"></span>
+          Night
+        </a>
+        <p>Bot hosting for builders. Online since 2024.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Hosting</h5>
+        <ul>
+          <li><a href="discord-bot-hosting.html">Discord bots</a></li>
+          <li><a href="nodejs-hosting.html">Node.js</a></li>
+          <li><a href="python-hosting.html">Python</a></li>
+          <li><a href="website-hosting.html">Websites</a></li>
+          <li><a href="database-hosting.html">Databases</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Platform</h5>
+        <ul>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="templates.html">Templates</a></li>
+          <li><a href="about.html">Our story</a></li>
+          <li><a href="changelog.html">Changelog</a></li>
+          <li><a href="partners.html">Partners</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Developers</h5>
+        <ul>
+          <li><a href="api.html">REST API</a></li>
+          <li><a href="docs.html">Docs</a></li>
+          <li><a href="cli.html">CLI</a></li>
+          <li><a href="status.html">Status</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <ul>
+          <li><a href="docs.html">Documentation</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="https://discord.gg/night" target="_blank">Discord</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024–2026 Night Hosting</span>
+      <div class="footer-bottom-links">
+        <a href="legal.html#terms">Terms</a>
+        <a href="legal.html#privacy">Privacy</a>
+        <a href="legal.html#refunds">Refunds</a>
+        <a href="status.html">Status</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

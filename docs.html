@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Docs — Night Bot Hosting</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🌙</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    .docs-layout { display: grid; grid-template-columns: 220px 1fr; gap: 0; min-height: calc(100vh - 60px); margin-top: 60px; }
+    .docs-sidebar { border-right: 1px solid var(--border); padding: 32px 20px; position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; }
+    .docs-sidebar h5 { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--text-3); text-transform: uppercase; margin: 20px 0 8px; }
+    .docs-sidebar h5:first-child { margin-top: 0; }
+    .docs-sidebar a { display: block; padding: 6px 10px; border-radius: 6px; font-size: 13px; color: var(--text-2); transition: 0.15s; }
+    .docs-sidebar a:hover { color: var(--white); background: var(--bg-3); }
+    .docs-sidebar a.active { color: var(--white); background: var(--bg-3); }
+    .docs-content { padding: 48px 56px; max-width: 740px; }
+    .docs-content h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.8px; color: var(--white); margin-bottom: 12px; }
+    .docs-content .lead { font-size: 16px; color: var(--text-2); line-height: 1.65; margin-bottom: 36px; border-bottom: 1px solid var(--border); padding-bottom: 28px; }
+    .docs-content h2 { font-size: 20px; font-weight: 600; color: var(--white); letter-spacing: -0.3px; margin: 36px 0 12px; }
+    .docs-content p { font-size: 14px; color: var(--text-2); line-height: 1.75; margin-bottom: 16px; }
+    .docs-content code { font-family: var(--mono); font-size: 12px; background: var(--bg-3); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; color: var(--white); }
+    .docs-content pre { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; overflow-x: auto; margin: 16px 0 24px; }
+    .docs-content pre code { background: none; border: none; padding: 0; font-size: 13px; line-height: 1.8; }
+    .docs-content ul { padding-left: 20px; margin-bottom: 16px; }
+    .docs-content ul li { font-size: 14px; color: var(--text-2); line-height: 1.75; margin-bottom: 6px; }
+    @media (max-width: 700px) { .docs-layout { grid-template-columns: 1fr; } .docs-sidebar { display: none; } .docs-content { padding: 32px 24px; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo"><span class="dot"></span>Night</a>
+      <div class="nav-links">
+        <a href="index.html#runtimes">Hosting</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="docs.html" style="color:var(--white)">Docs</a>
+        <a href="templates.html">Templates</a>
+      </div>
+      <div class="nav-actions">
+        <button class="btn-ghost" onclick="window.location.href='login.html'">Log in</button>
+        <button class="btn-primary" onclick="window.location.href='login.html'">Start free</button>
+      </div>
+      <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    </div>
+  </nav>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar">
+      <h5>Getting started</h5>
+      <a href="#" class="active">Introduction</a>
+      <a href="#">Quick start</a>
+      <a href="#">Deploy your first bot</a>
+      <a href="#">Environment variables</a>
+
+      <h5>Guides</h5>
+      <a href="#">Linking a domain</a>
+      <a href="#">Using databases</a>
+      <a href="#">GitHub integration</a>
+      <a href="#">Backups &amp; restores</a>
+      <a href="#">Shell access</a>
+
+      <h5>Runtimes</h5>
+      <a href="#">Node.js</a>
+      <a href="#">Python</a>
+      <a href="#">Java</a>
+      <a href="#">Go / Rust</a>
+      <a href="#">PHP</a>
+
+      <h5>Databases</h5>
+      <a href="#">MySQL</a>
+      <a href="#">PostgreSQL</a>
+      <a href="#">MongoDB</a>
+      <a href="#">Redis</a>
+
+      <h5>Developer</h5>
+      <a href="#">REST API</a>
+      <a href="#">CLI</a>
+      <a href="#">OAuth</a>
+    </aside>
+
+    <main class="docs-content">
+      <h1>Introduction</h1>
+      <p class="lead">Night is a bot and app hosting platform. Deploy your Discord bot, Telegram bot, Node.js app, Python script, website or database — all from one panel, with no server management.</p>
+
+      <h2>How it works</h2>
+      <p>Night runs your code inside isolated containers on our infrastructure. You push your code (via GitHub or file upload), set your environment variables, and Night keeps your process online — restarting it automatically if it crashes, taking rolling backups, and streaming logs to your panel in real time.</p>
+
+      <h2>Quick start</h2>
+      <p>The fastest way to deploy is from a GitHub repository:</p>
+      <pre><code><span class="t-dim"># 1. Connect GitHub in the panel
+# 2. Import your repository
+# 3. Set DISCORD_TOKEN in environment variables
+# 4. Click Deploy</span>
+
+<span class="t-green">✓ Build complete (2.1s)</span>
+<span class="t-green">✓ Container started</span>
+<span class="t-blue">Logged in as YourBot#0001 — 3 guilds</span></code></pre>
+
+      <h2>Environment variables</h2>
+      <p>Sensitive values like bot tokens and API keys go into environment variables. Mark them as <code>secret</code> to mask them in logs and hide them from the panel UI. Night injects them into your process at runtime — you access them the same way as on your local machine:</p>
+      <pre><code><span class="t-dim">// Node.js</span>
+<span class="t-blue">const</span> token = process.env.DISCORD_TOKEN;
+
+<span class="t-dim"># Python</span>
+<span class="t-blue">import</span> os
+token = os.getenv(<span class="t-green">"DISCORD_TOKEN"</span>)</code></pre>
+
+      <h2>Supported runtimes</h2>
+      <ul>
+        <li><strong>Node.js</strong> — v20, v22 (LTS). Supports npm, yarn and pnpm.</li>
+        <li><strong>Python</strong> — 3.11, 3.12. Supports pip and requirements.txt.</li>
+        <li><strong>Java</strong> — JDK 21. Maven and Gradle supported.</li>
+        <li><strong>Go</strong> — 1.22+. Standard go build toolchain.</li>
+        <li><strong>Rust</strong> — Stable channel. Cargo supported.</li>
+        <li><strong>PHP</strong> — 8.3. Composer supported.</li>
+      </ul>
+
+      <h2>Need help?</h2>
+      <p>Join our <a href="https://discord.gg/night" style="color:var(--white);text-decoration:underline">Discord community</a> or open a ticket from the panel. Pro and Enterprise customers get priority email support.</p>
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

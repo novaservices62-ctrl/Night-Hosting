@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log in — Night</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🌙</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    body { display: flex; min-height: 100vh; align-items: center; justify-content: center; }
+    .auth-box {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 48px 44px;
+      width: 100%;
+      max-width: 400px;
+      margin: 24px;
+    }
+    .auth-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 18px; font-weight: 700; color: var(--white);
+      margin-bottom: 36px;
+    }
+    .auth-logo .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--white); }
+    .auth-tabs {
+      display: flex; gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .auth-tab {
+      flex: 1; text-align: center; padding: 9px;
+      font-size: 14px; font-weight: 500; color: var(--text-3);
+      cursor: pointer; background: none; border: none;
+      transition: 0.15s;
+    }
+    .auth-tab.active { background: var(--bg-3); color: var(--white); }
+    label { display: block; font-size: 13px; font-weight: 500; color: var(--text-2); margin-bottom: 7px; }
+    .input-group { margin-bottom: 16px; }
+    input[type="email"], input[type="password"], input[type="text"] {
+      width: 100%;
+      background: var(--bg-3);
+      border: 1px solid var(--border-2);
+      border-radius: var(--radius);
+      color: var(--white);
+      font-family: var(--sans);
+      font-size: 14px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus { border-color: #555; }
+    input::placeholder { color: var(--text-3); }
+    .auth-submit {
+      width: 100%;
+      background: var(--white);
+      color: var(--bg);
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 11px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.15s;
+    }
+    .auth-submit:hover { opacity: 0.88; }
+    .auth-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 20px 0; color: var(--text-3); font-size: 12px;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .discord-btn {
+      width: 100%;
+      background: #5865f2;
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: opacity 0.15s;
+    }
+    .discord-btn:hover { opacity: 0.88; }
+    .auth-footer { text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-3); }
+    .auth-footer a { color: var(--text-2); text-decoration: underline; }
+    .register-panel { display: none; }
+    .register-panel.show { display: block; }
+    .login-panel.hide { display: none; }
+  </style>
+</head>
+<body>
+  <div class="auth-box">
+    <div class="auth-logo">
+      <span class="dot"></span>
+      Night
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="showLogin()">Log in</button>
+      <button class="auth-tab" id="tab-register" onclick="showRegister()">Register</button>
+    </div>
+
+    <!-- Login -->
+    <div class="login-panel" id="login-panel">
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" placeholder="you@example.com" autocomplete="email" />
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <button class="auth-submit">Log in</button>
+      <div class="auth-divider">or</div>
+      <button class="discord-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.001.022.015.043.03.054a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Continue with Discord
+      </button>
+      <div class="auth-footer">
+        <a href="#">Forgot password?</a>
+      </div>
+    </div>
+
+    <!-- Register -->
+    <div class="register-panel" id="register-panel">
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" placeholder="nightbot" autocomplete="username" />
+      </div>
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" placeholder="you@example.com" autocomplete="email" />
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••" autocomplete="new-password" />
+      </div>
+      <button class="auth-submit">Create account</button>
+      <div class="auth-divider">or</div>
+      <button class="discord-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.001.022.015.043.03.054a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Sign up with Discord
+      </button>
+      <div class="auth-footer">
+        By registering you agree to our <a href="legal.html#terms">Terms</a> and <a href="legal.html#privacy">Privacy Policy</a>.
+      </div>
+    </div>
+  </div>
+  <script>
+    function showLogin() {
+      document.getElementById('tab-login').classList.add('active');
+      document.getElementById('tab-register').classList.remove('active');
+      document.getElementById('login-panel').classList.remove('hide');
+      document.getElementById('register-panel').classList.remove('show');
+    }
+    function showRegister() {
+      document.getElementById('tab-register').classList.add('active');
+      document.getElementById('tab-login').classList.remove('active');
+      document.getElementById('register-panel').classList.add('show');
+      document.getElementById('login-panel').classList.add('hide');
+    }
+  </script>
+</body>
+</html>
